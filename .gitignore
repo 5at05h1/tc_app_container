@@ -12,3 +12,5 @@ tc_app/web-build/
 
 # macOS
 tc_app/.DS_Store
+
+.vscode/
