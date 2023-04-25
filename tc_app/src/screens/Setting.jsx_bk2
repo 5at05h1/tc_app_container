@@ -1,0 +1,452 @@
+import React, { useState,useEffect } from "react";
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert, BackHandler, AppState, ScrollView } from "react-native";
+import RadioButtonRN from 'radio-buttons-react-native';
+import * as Notifications from 'expo-notifications';
+import { Feather } from '@expo/vector-icons';
+
+import Loading from '../components/Loading';
+import GetDB from '../components/Get_databace';
+
+import * as SQLite from "expo-sqlite";
+const db = SQLite.openDatabase("db");
+
+// let domain = 'http://family.chinser.co.jp/irie/tc_app/';
+let domain = 'https://www.total-cloud.net/';
+
+export default function Setting(props) {
+  
+  if (AppState.currentState === 'active') {
+    Notifications.setBadgeCountAsync(0);
+  }
+  
+  const { navigation, route } = props;
+  
+  const [isLoading, setLoading] = useState(false);
+  
+  const [staffs, setStaffs] = useState(route.params);
+  
+  const [name_1, setName_1] = useState(route.params.name_1);
+  const [name_2, setName_2] = useState(route.params.name_2);
+  
+  const [staff_address, setstaff_address] = useState(route.params.staff_address);
+  const [staff_birthday_year, setstaff_birthday_year] = useState(route.params.staff_birthday_year);
+  const [staff_birthday_month, setstaff_birthday_month] = useState(route.params.staff_birthday_month);
+  const [staff_birthday_day, setstaff_birthday_day] = useState(route.params.staff_birthday_day);
+  const [staff_other, setstaff_other] = useState(route.params.staff_other);
+  
+  
+  const [contact, setContact] = useState(true);
+  
+  useEffect(() => {
+    
+    navigation.setOptions({
+      headerLeft: () => (
+          <Feather
+            name='chevron-left'
+            color='white'
+            size={30}
+            onPress={() => {
+              navigation.reset({
+                index: 0,
+                routes: [{
+                  name: 'CommunicationHistory',
+                  params: route.params,
+                  websocket:route.websocket,
+                  station:route.station,
+                  address:route.address,
+                  previous:'Setting'
+                }],
+              });
+            }}
+            style={{paddingHorizontal:20,paddingVertical:10}}
+          />
+      ),
+      headerRight: () => (
+          <Feather
+            name='log-out'
+            color='white'
+            size={30}
+            onPress={() => logout()}
+            style={{paddingHorizontal:20,paddingVertical:10}}
+          />
+      ),
+    });
+    
+    // 端末の戻るボタン
+    const backAction = () => {
+      navigation.reset({
+        index: 0,
+        routes: [{
+          name: 'CommunicationHistory' ,
+          params: route.params,
+          websocket:route.websocket,
+          station:route.station,
+          address:route.address,
+          previous:'Setting'
+        }],
+      });
+      return true;
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction
+    );
+
+    return () => backHandler.remove();
+  }, []);
+  
+function Delete_staff_db(){
+    
+  new Promise((resolve, reject)=>{
+    db.transaction((tx) => {
+    
+      // スタッフ
+      tx.executeSql(
+        `delete from staff_mst;`,  
+        [],
+        () => {console.log("delete staff_mst OK");},
+        () => {console.log("delete staff_mst 失敗");}
+      );
+      // スタッフ一覧
+      tx.executeSql(
+        `delete from staff_list;`,
+        [],
+        () => {console.log("staff_list 削除");},
+        () => {console.log("失敗");}
+      );
+      // お客様
+      tx.executeSql(
+        `delete from customer_mst;`,
+        [],
+        () => {console.log("customer_mst 削除");},
+        () => {console.log("失敗");}
+      );
+      // コミュニケーション履歴
+      tx.executeSql(
+        `delete from communication_mst;`,
+        [],
+        () => {console.log("communication_mst 削除");},
+        () => {console.log("失敗");}
+      );
+      // 定型文
+      tx.executeSql(
+        `delete from fixed_mst;`,
+        [],
+        () => {console.log("fixed_mst 削除");},
+        () => {console.log("失敗");}
+      );
+      
+    // →→→ 駅・沿線、エリアは残す
+    
+      resolve();
+    })
+    
+  });
+
+}
+  
+function logout() {
+  Alert.alert(
+      "ログアウトしますか？",
+      "",
+      [
+        {
+          text: "はい",
+          onPress: () => {
+            
+            Delete_staff_db();
+            // route.websocket.close()
+            
+            if(global.sp_token && global.sp_id){
+              
+              // サーバーに情報送信して、DBから削除
+              fetch(domain+'app/app_system/set_staff_app_token.php', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  id: global.sp_id,
+                  token: global.sp_token,
+                  del_flg:1,
+                }),
+              })
+              
+            }
+            
+            global.sp_token = ''; // スマホトークン
+            global.sp_id = '';    // ログインID
+            
+            navigation.reset({
+              index: 0,
+              routes: [{ name: 'LogIn' }],
+            });
+          }
+        },
+        {
+          text: "いいえ",
+        },
+      ]
+    );
+  
+}
+  
+function  onSubmit() {
+  
+  staffs.setting_list = staffs.setting_list.replace(',9_1','')
+  staffs.setting_list = staffs.setting_list.replace(',9','')
+  
+  if (contact === '9_1') {
+    staffs.setting_list = staffs.setting_list+',9_1'
+  } else if (contact === '9') {
+    staffs.setting_list = staffs.setting_list+',9'
+  }
+  
+  // ローカルDB変更
+  db.transaction((tx) => {
+    tx.executeSql(
+      'update staff_mst set setting_list = ? where (account = ? and password = ?);',
+      [staffs.setting_list,staffs.account,staffs.password],
+      // 変更成功
+      (_, { rows }) => {
+        tx.executeSql(
+          `select * from staff_mst;`,
+          [],
+          (_, { rows }) => {
+            route.params = rows._array[0];
+          },
+          () => {
+            console.log("失敗");
+          }
+        );
+        console.log('変更しました');
+      },
+      () => {
+        // 変更失敗
+        console.log('変更できなかったよ')
+      }
+    );
+  });
+  
+  fetch(domain+'batch_app/api_system_app.php?'+Date.now(),
+    {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: JSON.stringify({
+        ID : route.params.account,
+        pass : route.params.password,
+        staff_address : route.params.staff_address,
+        staff_birthday_year : route.params.staff_birthday_year,
+        staff_birthday_month : route.params.staff_birthday_month,
+        staff_birthday_day : route.params.staff_birthday_day,
+        staff_other : route.params.staff_other,
+        act:'user_setting',
+        contact:contact,
+      })
+    })
+      .then((response) => response.json())
+      .then((json) => {
+        Alert.alert('設定を変更しました');
+      })
+      .catch((error) => {
+        const errorMsg = "設定の変更に失敗しました";
+        Alert.alert(errorMsg);
+      })
+};
+
+  
+const radio = [
+              {
+                label: 'メール',
+                value: '',
+              },
+              {
+                label: 'アプリ',
+                value: '9_1'
+              }
+            ];
+            
+  if (staffs.line_id) {
+    radio.push(
+      {
+        label: 'LINE',
+        value: '9'
+      }
+    )
+  }
+
+  return (
+    
+    <ScrollView style={styles.form}>
+      <View style={{flexDirection: 'row'}}>
+        <View style={styles.input}>
+          <Text style={styles.label}>氏名(姓)</Text>
+          <TextInput
+            value={name_1}
+            onChangeText={(text) => {setName_1(text)}}
+            style={styles.inputInner}
+            editable={false}
+          />
+        </View>
+        <View style={styles.input}>
+          <Text style={styles.label}>氏名(名)</Text>
+          <TextInput
+            value={name_2}
+            onChangeText={(text) => {setName_2(text)}}
+            style={styles.inputInner}
+            editable={false}
+          />
+        </View>
+      </View>
+      
+      <Text style={styles.label}>連絡手段</Text>
+      <View >
+        <RadioButtonRN
+          data={radio}
+          value={contact}
+          selectedBtn={(e) => {setContact(e.value)}}
+          animationTypes={['rotate']}
+          activeColor={'#191970'}
+          initial={staffs.setting_list?
+                  staffs.setting_list.includes('9_1')?2
+                  :staffs.setting_list.includes('9')?3:1:1}
+        />
+        
+      </View>
+      
+      <Text style={styles.label}>写真</Text>
+      
+      
+      
+      
+      <Text style={styles.label}>出身市区</Text>
+      <TextInput
+        value={staff_address}
+        onChangeText={(text) => {setstaff_address(text)}}
+        style={styles.inputInner}
+        editable={true}
+      />
+      
+      <Text style={styles.label}>生年月日</Text>
+      <View style={{ flexDirection: 'row' }}>
+        <TextInput
+          value={staff_birthday_year}
+          onChangeText={(text) => {setstaff_birthday_year(isNaN(text) ? staff_birthday_year : text)}}
+          style={styles.inputInnerbirthday}
+          editable={true}
+        />
+        <Text style={styles.label}>年</Text>
+        
+        <TextInput
+          value={staff_birthday_month}
+          onChangeText={(text) => {setstaff_birthday_month(text)}}
+          style={styles.inputInnerbirthday}
+          editable={true}
+          onChangeText={(text) => {
+            setstaff_birthday_month(isNaN(text) ? staff_birthday_month : text);
+          }}
+        />
+        <Text style={styles.label}>月</Text>
+        
+        <TextInput
+          value={staff_birthday_day}
+          onChangeText={(text) => {setstaff_birthday_day(isNaN(text) ? staff_birthday_day : text)}}
+          style={styles.inputInnerbirthday}
+          editable={true}
+        />
+        <Text style={styles.label}>日</Text>
+      </View>
+      
+      <Text style={styles.label}>趣味や特技、休日の過ごし方、興味があること</Text>
+      <TextInput
+        value={staff_other}
+        onChangeText={(text) => {setstaff_other(text)}}
+        style={styles.inputArea}
+        multiline={true}
+      />
+      
+      
+      <TouchableOpacity
+        onPress={onSubmit}
+        style={styles.submit}
+      >
+        <Text style={styles.submitLabel}>確　定</Text>
+      </TouchableOpacity>
+    </ScrollView>
+  );
+}
+
+const styles = StyleSheet.create({
+  form: {
+    width: "100%",
+    padding: 24,
+  },
+  label: {
+    marginTop: 20,
+    marginBottom:10,
+    marginLeft:5,
+    fontSize:16,
+  },
+  input: {
+    marginBottom: 10,
+    width:'50%',
+  },
+  inputInner: {
+    marginHorizontal:5,
+    padding:10,
+    backgroundColor: '#fff',
+    borderColor: '#191970',
+    fontSize:16,
+    borderWidth: 1.5, 
+    borderRadius: 8,
+    color:'#000000'
+  },
+  inputInnerbirthday: {
+    marginHorizontal:5,
+    padding:10,
+    backgroundColor: '#fff',
+    borderColor: '#191970',
+    fontSize:16,
+    borderWidth: 1.5, 
+    borderRadius: 8,
+    textAlign: 'right',
+    width:'20%',
+    color:'#000000'
+  },
+  inputArea: {
+    height:150,
+    marginHorizontal:5,
+    padding:10,
+    backgroundColor: '#fff',
+    borderColor: '#191970',
+    fontSize:16,
+    borderWidth: 1.5, 
+    borderRadius: 8,
+    color:'#000000'
+  },
+  
+  radioLabel: {
+    fontSize: 16,
+  },
+  error: {
+    color: 'red'
+  },
+  submit: {
+    marginTop:30,
+    marginBottom:50,
+    backgroundColor: '#47a9ce',
+    borderRadius: 8,
+    alignSelf: 'center',
+  },
+  submitLabel: {
+    fontSize: 20,
+    lineHeight: 32,
+    paddingVertical: 8,
+    paddingHorizontal: 32,
+    color: '#ffffff',
+  },
+});
