@@ -10,34 +10,33 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "notification": { // androidの通知アイコン
-      "icon": "./assets/notificationicon.png",
+    "notification": {
+      // androidの通知アイコン
+      "icon": "./assets/notificationicon.png"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
-    "bundleIdentifier": "com.totalcloud.totalcloud",
+      "bundleIdentifier": "com.totalcloud.totalcloud",
       "googleServicesFile": "./GoogleService-Info.plist",
       "buildNumber": "2.1.3", //20220615更新
       "infoPlist": {
-        "UIRequiresFullScreen":"YES",
-        "CFBundleDevelopmentRegion":"ja_JP",
-        "NSPhotoLibraryUsageDescription":"プロフィールに写真を登録するのに使用します",
+        "UIRequiresFullScreen": "YES",
+        "CFBundleDevelopmentRegion": "ja_JP",
+        "NSPhotoLibraryUsageDescription": "プロフィールに写真を登録するのに使用します",
         "NSCameraUsageDescription": "オンライン通話にカメラを使用します",
-        "NSMicrophoneUsageDescription": "オンライン通話にマイクを使用します",
+        "NSMicrophoneUsageDescription": "オンライン通話にマイクを使用します"
         // "NSLocationAlwaysUsageDescription": "このソフトウェアは使用しません",
         // "NSLocationUsageDescription": "このソフトウェアは使用しません",
         // "NSLocationWhenInUseUsageDescription": "このソフトウェアは使用しません",
         // "NSUserTrackingUsageDescription": "このソフトウェアは使用しません"
-       },
+      },
       "supportsTablet": true
     },
     "android": {
-     "versionCode":30, //20220615更新
+      "versionCode": 30, //20220615更新
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#FFFFFF"

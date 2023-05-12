@@ -784,7 +784,7 @@ export default function LogInScreen(props) {
   async function registerForPushNotificationsAsync() {
     let token;
     let experienceId = undefined;
-
+    console.log(Constants)
     if (Constants.isDevice) {
       const { status: existingStatus } =
         await Notifications.getPermissionsAsync();
