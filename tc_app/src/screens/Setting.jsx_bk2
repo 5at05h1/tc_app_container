@@ -103,7 +103,7 @@ function Delete_staff_db(){
     
       // スタッフ
       tx.executeSql(
-        `delete from staff_mst;`,  
+        `delete from staff_mst;`,
         [],
         () => {console.log("delete staff_mst OK");},
         () => {console.log("delete staff_mst 失敗");}
@@ -145,7 +145,7 @@ function Delete_staff_db(){
   });
 
 }
-  
+
 function logout() {
   Alert.alert(
       "ログアウトしますか？",
@@ -258,7 +258,7 @@ function  onSubmit() {
       })
 };
 
-  
+
 const radio = [
               {
                 label: 'メール',
@@ -269,7 +269,7 @@ const radio = [
                 value: '9_1'
               }
             ];
-            
+
   if (staffs.line_id) {
     radio.push(
       {
@@ -401,7 +401,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderColor: '#191970',
     fontSize:16,
-    borderWidth: 1.5, 
+    borderWidth: 1.5,
     borderRadius: 8,
     color:'#000000'
   },
@@ -411,7 +411,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderColor: '#191970',
     fontSize:16,
-    borderWidth: 1.5, 
+    borderWidth: 1.5,
     borderRadius: 8,
     textAlign: 'right',
     width:'20%',
@@ -424,7 +424,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderColor: '#191970',
     fontSize:16,
-    borderWidth: 1.5, 
+    borderWidth: 1.5,
     borderRadius: 8,
     color:'#000000'
   },

@@ -36,7 +36,6 @@ const db = SQLite.openDatabase("db");
 // oishi グローバル変数
 global.sp_token = ""; // スマホトークン
 global.sp_id = ""; // ログインID
-
 global.fc_flg = ""; // fcフラグ
 
 Notifications.setNotificationHandler({

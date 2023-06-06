@@ -215,9 +215,7 @@ export default function CreateDB(props) {
 
           // スタッフ一覧インデックス作成
           tx.executeSql(
-            `CREATE INDEX "index_staff_list" ON "staff_list" (
-                	"account"
-                );`,
+            `CREATE INDEX "index_staff_list" ON "staff_list" ( "account" );`,
             [],
             () => {
               console.log("スタッフ一覧インデックス作成");
@@ -260,9 +258,7 @@ export default function CreateDB(props) {
 
           // お客様インデックス作成
           tx.executeSql(
-            `CREATE INDEX "index_customer_mst" ON "customer_mst" (
-                	"customer_id"
-                );`,
+            `CREATE INDEX "index_customer_mst" ON "customer_mst" ( "customer_id" );`,
             [],
             () => {
               console.log("お客様インデックス作成");
@@ -331,9 +327,7 @@ export default function CreateDB(props) {
           );
           // 定型文インデックス作成
           tx.executeSql(
-            `CREATE INDEX "index_fixed_mst" ON "fixed_mst" (
-                	"category"
-                );`,
+            `CREATE INDEX "index_fixed_mst" ON "fixed_mst" ( "category" );`,
             [],
             () => {
               console.log("定型文インデックス作成");
