@@ -609,9 +609,9 @@ export default function LogInScreen(props) {
         global.sp_id = id;
 
         // トークン取得＆登録
-        registerForPushNotificationsAsync().then((token) =>
-          setExpoPushToken(token)
-        );
+        registerForPushNotificationsAsync().then((token) => {
+          setExpoPushToken(token);
+        });
 
         // websocket通信
         const WS_URL = "ws://54.168.20.149:8080/ws/" + json.staff.shop_id + "/";
@@ -671,7 +671,7 @@ export default function LogInScreen(props) {
           routes: [
             {
               name: "CommunicationHistory",
-              params: json.staff,
+              params: staff,
               websocket: new WebSocket(WS_URL),
               station: station,
               address: address,
