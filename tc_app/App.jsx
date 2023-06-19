@@ -7,6 +7,7 @@ import {
 } from "@react-navigation/stack";
 import Feather from "react-native-vector-icons/Feather";
 import { RootSiblingParent } from "react-native-root-siblings";
+import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList, DrawerItem } from '@react-navigation/drawer';
 
 import LogInScreen from "./src/screens/LogInScreen";
 import CommunicationHistoryScreen from "./src/screens/CommunicationHistoryScreen";
@@ -16,33 +17,50 @@ import Loading from "./src/components/Loading";
 import BellScreen from "./src/screens/BellScreen";
 
 const Stack = createStackNavigator();
+const Drawer = createDrawerNavigator();
+
 LogBox.ignoreLogs(["Setting a timer"]);
 
 export default function App() {
+
   return (
     <RootSiblingParent>
       <NavigationContainer>
-        <Stack.Navigator
+        <Drawer.Navigator
           initialRouteName="LogIn"
           screenOptions={{
+            drawerPosition:'right',
             headerTitleAlign: "left",
             gestureEnabled: true,
             gestureDirection: "horizontal",
             cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
           }}
         >
-          <Stack.Screen name="LogIn" component={LogInScreen} />
-          <Stack.Screen
+          <Drawer.Screen
+            name="LogIn"
+            component={LogInScreen}
+            options={{
+              drawerItemStyle: { display: 'none' },
+              swipeEnabled:false,
+            }}
+          />
+          <Drawer.Screen
             name="CommunicationHistory"
             component={CommunicationHistoryScreen}
             options={{
               gestureDirection: "horizontal-inverted",
             }}
           />
-          <Stack.Screen name="Setting" component={Setting} />
-          <Stack.Screen name="TalkScreen" component={TalkScreen} />
-          <Stack.Screen name="BellScreen" component={BellScreen} />
-        </Stack.Navigator>
+          <Drawer.Screen name="Setting" component={Setting} />
+          <Drawer.Screen
+            name="TalkScreen"
+            component={TalkScreen}
+            options={{
+              drawerItemStyle: { display: 'none' }
+            }}
+          />
+          <Drawer.Screen name="BellScreen" component={BellScreen} />
+        </Drawer.Navigator>
       </NavigationContainer>
     </RootSiblingParent>
   );

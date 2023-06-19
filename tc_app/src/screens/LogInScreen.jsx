@@ -222,6 +222,13 @@ export default function LogInScreen(props) {
       //await GetDB(rocalDBProfile,'staff_profile');
     };
     execute();
+
+    navigation.setOptions({
+      headerRight: () => (
+        <View></View>
+      )
+    })
+
   }, []);
 
   // 取得したトークンで自動ログイン

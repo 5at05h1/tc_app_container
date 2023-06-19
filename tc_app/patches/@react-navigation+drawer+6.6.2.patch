@@ -1,0 +1,48 @@
+diff --git a/node_modules/@react-navigation/drawer/src/views/DrawerToggleButton.tsx b/node_modules/@react-navigation/drawer/src/views/DrawerToggleButton.tsx
+index b6ad164..c777b90 100644
+--- a/node_modules/@react-navigation/drawer/src/views/DrawerToggleButton.tsx
++++ b/node_modules/@react-navigation/drawer/src/views/DrawerToggleButton.tsx
+@@ -6,6 +6,7 @@ import {
+ } from '@react-navigation/native';
+ import * as React from 'react';
+ import { Image, Platform, StyleSheet } from 'react-native';
++import { Feather } from '@expo/vector-icons';
+ 
+ import type { DrawerNavigationProp } from '../types';
+ 
+@@ -32,10 +33,15 @@ export default function DrawerToggleButton({ tintColor, ...rest }: Props) {
+         default: { top: 16, right: 16, bottom: 16, left: 16 },
+       })}
+     >
+-      <Image
++      {/* <Image
+         style={[styles.icon, tintColor ? { tintColor } : null]}
+         source={require('./assets/toggle-drawer-icon.png')}
+         fadeDuration={0}
++      /> */}
++      <Feather
++        name='menu'
++        size={50}
++        color='#ffffff'
+       />
+     </PlatformPressable>
+   );
+diff --git a/node_modules/@react-navigation/drawer/src/views/DrawerView.tsx b/node_modules/@react-navigation/drawer/src/views/DrawerView.tsx
+index 9ec1d45..e075ce8 100644
+--- a/node_modules/@react-navigation/drawer/src/views/DrawerView.tsx
++++ b/node_modules/@react-navigation/drawer/src/views/DrawerView.tsx
+@@ -237,8 +237,12 @@ function DrawerViewBase({
+                 {...options}
+                 layout={layout}
+                 title={getHeaderTitle(options, route.name)}
+-                headerLeft={
+-                  options.headerLeft ??
++                // headerLeft={
++                //   options.headerLeft ??
++                //   ((props) => <DrawerToggleButton {...props} />)
++                // }
++                headerRight={
++                  options.headerRight ??
+                   ((props) => <DrawerToggleButton {...props} />)
+                 }
+               />
