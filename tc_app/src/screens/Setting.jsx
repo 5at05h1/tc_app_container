@@ -2994,7 +2994,7 @@ const styles = StyleSheet.create({
     marginLeft: 0,
   },
   dropDown: {
-    height: 40,
+    height: 50,
     width: 160,
     backgroundColor: "#fff",
     borderColor: "#191970",
