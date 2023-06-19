@@ -49,9 +49,16 @@ export default function App() {
             component={CommunicationHistoryScreen}
             options={{
               gestureDirection: "horizontal-inverted",
+              title: "コミュニケーション履歴"
             }}
           />
-          <Drawer.Screen name="Setting" component={Setting} />
+          <Drawer.Screen
+            name="Setting"
+            component={Setting}
+            options={{
+              title: "設定"
+            }}
+          />
           <Drawer.Screen
             name="TalkScreen"
             component={TalkScreen}
@@ -59,7 +66,13 @@ export default function App() {
               drawerItemStyle: { display: 'none' }
             }}
           />
-          <Drawer.Screen name="BellScreen" component={BellScreen} />
+          <Drawer.Screen
+            name="BellScreen"
+            component={BellScreen}
+            options={{
+              title: "通知"
+            }}
+          />
         </Drawer.Navigator>
       </NavigationContainer>
     </RootSiblingParent>
