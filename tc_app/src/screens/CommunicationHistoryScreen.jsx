@@ -21,11 +21,13 @@ import {
   Platform,
   Linking,
   Image,
+  Dimensions,
 } from "react-native";
 import DropDownPicker, { Item } from "react-native-dropdown-picker";
 import * as Notifications from "expo-notifications";
 import { Feather } from "@expo/vector-icons";
 import * as Permissions from "expo-permissions";
+import SideMenu from 'react-native-side-menu-updated';
 
 import Loading from "../components/Loading";
 import GetDB from "../components/Get_databace";
@@ -39,6 +41,7 @@ const db = SQLite.openDatabase("db");
 let domain = "https://www.total-cloud.net/";
 
 Notifications.setBadgeCountAsync(0);
+
 
 export default function CommunicationHistoryScreen(props) {
   if (AppState.currentState === "active") {
@@ -61,7 +64,8 @@ export default function CommunicationHistoryScreen(props) {
 
   const responseListener = useRef();
 
-  // console.log(route.profile);
+  const [menu, setMenu] = useState(false);
+  const deviceScreen = Dimensions.get('window');
 
   const items = staffs.map((item) => {
     return {
@@ -321,6 +325,27 @@ export default function CommunicationHistoryScreen(props) {
       notificationInteractionSubscription.remove();
     };
   }, []);
+
+  
+  // ハンバーガーメニュー
+  navigation.setOptions({
+    headerRight: () => (
+      <View style={{marginRight:15}}>
+        <TouchableOpacity
+          style={{width:60,height:60,justifyContent:'center',alignItems:'center'}}
+          onPress={() => {
+            setMenu(!menu);
+          }}
+        >
+          <Feather
+            name="menu"
+            color="white"
+            size={35}
+          />
+        </TouchableOpacity>
+      </View>
+    ),
+  });
 
   useEffect(() => {
     if (route.notifications && fixed) {
@@ -1327,177 +1352,212 @@ export default function CommunicationHistoryScreen(props) {
     setA(false);
   }
 
-  // ヘッダー移転先【変数代入効かないから】
-  navigation.setOptions({
-    headerRight: () => (
-      <View style={{ flexDirection: "row", justifyContent: "center" }}>
-        <View>
+  function headerRight() {
+    return (
+      <View style={{backgroundColor:'#fff',flex:1,paddingTop:25}}>
+        <TouchableOpacity
+          style={styles.menulist}
+          onPress={() => {
+            navigation.reset({
+              index: 0,
+              routes: [
+                {
+                  name: "BellScreen",
+                  params: route.params,
+                  websocket: route.websocket,
+                  station: route.station,
+                  address: route.address,
+                  profile: route.profile,
+                  staff: staffs,
+                  fixed: fixed,
+                },
+              ],
+            });
+          }}
+        >
           <Feather
             name="bell"
-            color="white"
-            size={35}
-            onPress={() => {
-              navigation.reset({
-                index: 0,
-                routes: [
-                  {
-                    name: "BellScreen",
-                    params: route.params,
-                    websocket: route.websocket,
-                    station: route.station,
-                    address: route.address,
-                    profile: route.profile,
-                    staff: staffs,
-                    fixed: fixed,
-                  },
-                ],
-              });
-            }}
-            style={{ paddingHorizontal: 10, paddingVertical: 10 }}
+            color={global.fc_flg?"#fd2c77":"#1d449a"}
+            size={30}
           />
-          <View style={bell_count ? styles.belltext : { display: "none" }}>
-            <Text Id="bell_text" style={{ color: "white" }}>
-              {bell_count}
-            </Text>
-          </View>
-        </View>
-        <View>
+          <Text style={styles.menutext}>通知</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.menulist}
+          onPress={() => {
+            navigation.reset({
+              index: 0,
+              routes: [
+                {
+                  name: "Setting",
+                  params: route.params,
+                  websocket: route.websocket,
+                  station: route.station,
+                  address: route.address,
+                  profile: route.profile,
+                },
+              ],
+            });
+          }}
+        >
           <Feather
             name="settings"
-            color="white"
-            size={35}
-            onPress={() => {
-              navigation.reset({
-                index: 0,
-                routes: [
-                  {
-                    name: "Setting",
-                    params: route.params,
-                    websocket: route.websocket,
-                    station: route.station,
-                    address: route.address,
-                    profile: route.profile,
-                  },
-                ],
-              });
-            }}
-            style={{ paddingHorizontal: 20, paddingVertical: 10 }}
+            color={global.fc_flg?"#fd2c77":"#1d449a"}
+            size={30}
           />
-        </View>
+          <Text style={styles.menutext}>設定</Text>
+        </TouchableOpacity>
       </View>
-    ),
-  });
+    )
+  }
 
   return (
-    <View style={styles.container}>
-      <Loading isLoading={isLoading} />
-      <View style={styles.search}>
-        <View style={styles.searchinner}>
-          <TextInput
-            style={styles.searchInput}
-            value={name}
-            onChangeText={(text) => {
-              setName(text);
-            }}
-            placeholder="  お客様名検索"
-          />
-          <TouchableOpacity style={styles.buttonContainer} onPress={onSubmit}>
-            <Text style={styles.buttonLabel}>検　索</Text>
-          </TouchableOpacity>
+    <SideMenu
+      menu={headerRight()}
+      isOpen={menu}
+      onChange={isOpen => {
+        setMenu(isOpen);
+      }}
+      menuPosition={'right'}
+      openMenuOffset={deviceScreen.width * 0.5}
+    >
+      <View style={styles.container}>
+        <View style={menu&&styles.container2}></View>
+        <Loading isLoading={isLoading} />
+        <View style={styles.search}>
+          <View style={styles.searchinner}>
+            <TextInput
+              style={styles.searchInput}
+              value={name}
+              onChangeText={(text) => {
+                setName(text);
+              }}
+              placeholder="  お客様名検索"
+            />
+            <TouchableOpacity style={styles.buttonContainer} onPress={onSubmit}>
+              <Text style={styles.buttonLabel}>検　索</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
-      <DropDownPicker
-        style={styles.DropDown}
-        dropDownContainerStyle={styles.dropDownContainer}
-        open={open}
-        value={staff_value}
-        items={items}
-        setOpen={setOpen}
-        setValue={setStaff_Value}
-        placeholder="▼　担当者"
-        zIndex={999}
-        onClose={() => {
-          setA("a");
-        }}
-      />
-      <FlatList
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-        initialNumToRender={10}
-        data={memos}
-        renderItem={({ item }) => {
-          if (!item.del_flg) {
-            return (
-              <TouchableOpacity
-                style={styles.ListItem}
-                onPress={() => {
-                  navigation.reset({
-                    index: 0,
-                    routes: [
-                      {
-                        name: "TalkScreen",
-                        params: route.params,
-                        customer: item.customer_id,
-                        websocket: route.websocket,
-                        station: route.station,
-                        address: route.address,
-                        profile: route.profile,
-                        staff: staffs,
-                        fixed: fixed,
-                        cus_name: item.name,
-                      },
-                    ],
-                  });
-                }}
-              >
-                <View style={styles.ListInner}>
-                  <View style={{ flexDirection: "row" }}>
-                    <Text
-                      style={
-                        item.status == "未対応"
-                          ? { color: "red", fontSize: 18 }
-                          : { display: "none" }
-                      }
-                    >
-                      ●
+        <DropDownPicker
+          style={styles.DropDown}
+          dropDownContainerStyle={styles.dropDownContainer}
+          open={open}
+          value={staff_value}
+          items={items}
+          setOpen={setOpen}
+          setValue={setStaff_Value}
+          placeholder="▼　担当者"
+          zIndex={999}
+          onClose={() => {
+            setA("a");
+          }}
+        />
+        <FlatList
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+          initialNumToRender={10}
+          data={memos}
+          renderItem={({ item }) => {
+            if (!item.del_flg) {
+              return (
+                <TouchableOpacity
+                  style={styles.ListItem}
+                  onPress={() => {
+                    navigation.reset({
+                      index: 0,
+                      routes: [
+                        {
+                          name: "TalkScreen",
+                          params: route.params,
+                          customer: item.customer_id,
+                          websocket: route.websocket,
+                          station: route.station,
+                          address: route.address,
+                          profile: route.profile,
+                          staff: staffs,
+                          fixed: fixed,
+                          cus_name: item.name,
+                        },
+                      ],
+                    });
+                  }}
+                >
+                  <View style={styles.ListInner}>
+                    <View style={{ flexDirection: "row" }}>
+                      <Text
+                        style={
+                          item.status == "未対応"
+                            ? { color: "red", fontSize: 18 }
+                            : { display: "none" }
+                        }
+                      >
+                        ●
+                      </Text>
+                      <Text style={styles.name} numberOfLines={1}>
+                        {item.name
+                          ? item.name.length < 10
+                            ? item.name
+                            : item.name.substring(0, 10) + "..."
+                          : ""}
+                      </Text>
+                    </View>
+                    <Text style={styles.date}>
+                      {item.time ? item.time.slice(0, -3) : ""}
                     </Text>
-                    <Text style={styles.name} numberOfLines={1}>
-                      {item.name
-                        ? item.name.length < 10
-                          ? item.name
-                          : item.name.substring(0, 10) + "..."
-                        : ""}
+                    <Text style={styles.message} numberOfLines={1}>
+                      {item.title === "スタンプ"
+                        ? "スタンプを送信しました"
+                        : !item.note
+                        ? item.title
+                        : item.note}
                     </Text>
                   </View>
-                  <Text style={styles.date}>
-                    {item.time ? item.time.slice(0, -3) : ""}
-                  </Text>
-                  <Text style={styles.message} numberOfLines={1}>
-                    {item.title === "スタンプ"
-                      ? "スタンプを送信しました"
-                      : !item.note
-                      ? item.title
-                      : item.note}
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            );
-          }
-        }}
-        keyExtractor={(item) => `${item.customer_id}`}
-      />
-    </View>
+                </TouchableOpacity>
+              );
+            }
+          }}
+          keyExtractor={(item) => `${item.customer_id}`}
+        />
+      </View>
+    </SideMenu>
   );
 }
 
 const styles = StyleSheet.create({
+  menulist: {
+    flexDirection:'row',
+    marginLeft:15,
+    marginVertical:10,
+    alignItems:'center',
+    height:40,
+  },
+  menutext: {
+    fontSize:20,
+    marginLeft:10
+  },
   header_img: {
     width: 150,
     height: 45,
   },
   container: {
     flex: 1,
+    backgroundColor:'#f1f1f1'
+  },
+  container2: {
+    flex: 1,
+    position: "absolute",
+    width: "100%",
+    height: "100%",
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.2)",
+    zIndex: 1000,
   },
   search: {
     zIndex: 100,
