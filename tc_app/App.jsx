@@ -11,6 +11,7 @@ import TalkScreen from './src/screens/TalkScreen';
 import Setting from './src/screens/Setting';
 import Loading from './src/components/Loading';
 import BellScreen from './src/screens/BellScreen';
+import Ranking from './src/screens/Ranking';
 
 
 const Stack = createStackNavigator();
@@ -52,6 +53,10 @@ export default function App() {
         <Stack.Screen
           name="BellScreen"
           component={BellScreen}
+        />
+        <Stack.Screen
+          name="Ranking"
+          component={Ranking}
         />
       </Stack.Navigator>
     </NavigationContainer>

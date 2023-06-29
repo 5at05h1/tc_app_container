@@ -26,6 +26,7 @@ import {
 import DropDownPicker, { Item } from "react-native-dropdown-picker";
 import * as Notifications from "expo-notifications";
 import { Feather } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Permissions from "expo-permissions";
 import SideMenu from 'react-native-side-menu-updated';
 
@@ -1375,10 +1376,10 @@ export default function CommunicationHistoryScreen(props) {
             });
           }}
         >
-          <Feather
-            name="bell"
+          <MaterialCommunityIcons
+            name="bell-circle"
             color={global.fc_flg?"#fd2c77":"#1d449a"}
-            size={30}
+            size={35}
           />
           <Text style={styles.menutext}>通知</Text>
         </TouchableOpacity>
@@ -1400,12 +1401,37 @@ export default function CommunicationHistoryScreen(props) {
             });
           }}
         >
-          <Feather
-            name="settings"
+          <MaterialCommunityIcons
+            name="account-circle"
             color={global.fc_flg?"#fd2c77":"#1d449a"}
-            size={30}
+            size={35}
           />
           <Text style={styles.menutext}>設定</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.menulist}
+          onPress={() => {
+            navigation.reset({
+              index: 0,
+              routes: [
+                {
+                  name: "Ranking",
+                  params: route.params,
+                  websocket: route.websocket,
+                  station: route.station,
+                  address: route.address,
+                  profile: route.profile,
+                },
+              ],
+            });
+          }}
+        >
+          <MaterialCommunityIcons
+            name="crown-circle"
+            color={global.fc_flg?"#fd2c77":"#1d449a"}
+            size={35}
+          />
+          <Text style={styles.menutext}>売上順位</Text>
         </TouchableOpacity>
       </View>
     )
@@ -1526,17 +1552,6 @@ export default function CommunicationHistoryScreen(props) {
 }
 
 const styles = StyleSheet.create({
-  menulist: {
-    flexDirection:'row',
-    marginLeft:15,
-    marginVertical:10,
-    alignItems:'center',
-    height:40,
-  },
-  menutext: {
-    fontSize:20,
-    marginLeft:10
-  },
   header_img: {
     width: 150,
     height: 45,
@@ -1556,7 +1571,7 @@ const styles = StyleSheet.create({
     left: 0,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0,0,0,0.2)",
+    backgroundColor: "rgba(0,0,0,0.5)",
     zIndex: 1000,
   },
   search: {
@@ -1644,5 +1659,16 @@ const styles = StyleSheet.create({
     paddingLeft: 5,
     paddingRight: 5,
     left: 30,
+  },
+  menulist: {
+    flexDirection:'row',
+    marginLeft:10,
+    marginVertical:10,
+    alignItems:'center',
+    height:40,
+  },
+  menutext: {
+    fontSize:20,
+    marginLeft:10
   },
 });
